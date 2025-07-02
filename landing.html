@@ -39,9 +39,12 @@
 
     usernameInput.addEventListener("input", () => {
       const username = usernameInput.value.trim();
+      const basePath = window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, '/');
+      
       if (username !== "") {
-        myLinkInput.value = `${window.location.origin}/msg.html?key=${encodeURIComponent(username)}`;
-      } else {
+        myLinkInput.value = `${basePath}msg.html?key=${encodeURIComponent(username)}`;
+      } 
+      else {
         myLinkInput.value = "";
       }
     });
