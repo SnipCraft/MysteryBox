@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>📥 MysteryBox Inbox</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>📥 Your Anonymous Inbox</h1>
+    <input type="text" id="keyInput" placeholder="Enter your username..." />
+    <button onclick="loadMessages()">Load Messages</button>
+    <ul id="messageList"></ul>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDuaqy_IMQU85K7a1q4d8ipEiJCke5w8Uc",
+      authDomain: "mysterybox-8ac08.firebaseapp.com",
+      databaseURL: "https://mysterybox-8ac08-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "mysterybox-8ac08",
+      storageBucket: "mysterybox-8ac08.appspot.com",
+      messagingSenderId: "836179446451",
+      appId: "1:836179446451:web:21be8a0bf2a35aa6067ec6"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    function loadMessages() {
+      const key = document.getElementById("keyInput").value.trim();
+      const list = document.getElementById("messageList");
+      list.innerHTML = "";
+
+      if (!key) {
+        alert("Please enter your username key.");
+        return;
+      }
+
+      db.ref(`messages/${key}`).once("value", snapshot => {
+        if (!snapshot.exists()) {
+          list.innerHTML = "<li>No messages found for this inbox.</li>";
+          return;
+        }
+
+        snapshot.forEach(child => {
+          const msg = child.val();
+          const li = document.createElement("li");
+          li.textContent = `${msg.message} 🕓 ${msg.time}`;
+          list.appendChild(li);
+        });
+      });
+    }
+  </script>
+</body>
+</html>

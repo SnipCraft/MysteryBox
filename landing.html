@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Welcome to MysteryBox 💌</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="landing">
+    <h1>Welcome to MysteryBox 💌</h1>
+    <p>Send or receive anonymous messages — 100% private.</p>
+
+    <button class="cta-btn" onclick="window.location.href='msg.html'">
+      Send Anonymous Message
+    </button>
+
+    <button class="cta-btn" onclick="window.location.href='inbox.html'">
+      View My Inbox
+    </button>
+
+    <div class="copy-link-box">
+      <p>Enter your username:</p>
+      <input type="text" id="usernameInput" placeholder="e.g., Your name" />
+      <p>Your MysteryBox link:</p>
+      <input type="text" id="myLink" readonly />
+      <button onclick="copyLink()">Copy Link</button>
+      <span id="copyStatus"></span>
+    </div>
+
+    <div class="footer">
+      <p>Made with ❤️ | Your identity is safe here.</p>
+    </div>
+  </div>
+
+  <script>
+    const usernameInput = document.getElementById("usernameInput");
+    const myLinkInput = document.getElementById("myLink");
+
+    usernameInput.addEventListener("input", () => {
+      const username = usernameInput.value.trim();
+      if (username !== "") {
+        myLinkInput.value = `${window.location.origin}/msg.html?key=${encodeURIComponent(username)}`;
+      } else {
+        myLinkInput.value = "";
+      }
+    });
+
+    function copyLink() {
+      if (myLinkInput.value !== "") {
+        myLinkInput.select();
+        myLinkInput.setSelectionRange(0, 99999);
+        document.execCommand("copy");
+        document.getElementById("copyStatus").innerText = "Link copied!";
+        setTimeout(() => {
+          document.getElementById("copyStatus").innerText = "";
+        }, 2000);
+      }
+    }
+  </script>
+</body>
+</html>

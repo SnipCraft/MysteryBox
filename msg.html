@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MysteryBox – Send</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>💌 Drop a Message</h1>
+    <textarea id="msgInput" placeholder="Say something anonymously..."></textarea>
+    <button id="submitBtn">Send</button>
+    <p id="statusMsg"></p>
+  </div>
+
+  <!-- Firebase v8 -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDuaqy_IMQU85K7a1q4d8ipEiJCke5w8Uc",
+      authDomain: "mysterybox-8ac08.firebaseapp.com",
+      databaseURL: "https://mysterybox-8ac08-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "mysterybox-8ac08",
+      storageBucket: "mysterybox-8ac08.appspot.com",
+      messagingSenderId: "836179446451",
+      appId: "1:836179446451:web:21be8a0bf2a35aa6067ec6"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const userKey = urlParams.get("key") || "default";
+
+    document.getElementById("submitBtn").addEventListener("click", () => {
+      const msg = document.getElementById("msgInput").value.trim();
+      const status = document.getElementById("statusMsg");
+
+      if (!msg) {
+        status.textContent = "Message can't be empty!";
+        status.style.color = "red";
+        return;
+      }
+
+      db.ref(`messages/${userKey}`).push({
+        message: msg,
+        time: new Date().toLocaleString()
+      });
+
+      document.getElementById("msgInput").value = "";
+      status.textContent = "Message sent anonymously!";
+      status.style.color = "green";
+    });
+  </script>
+</body>
+</html>
