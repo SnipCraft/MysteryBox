@@ -5,6 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>📥 MysteryBox Inbox</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    ul#messageList li {
+      background: #f3f3f3;
+      padding: 1rem;
+      margin: 0.5rem 0;
+      border-radius: 10px;
+    }
+
+    button {
+      margin-right: 8px;
+      padding: 4px 10px;
+      font-size: 0.9rem;
+    }
+
+    input {
+      padding: 0.5rem;
+      border-radius: 10px;
+      width: 70%;
+      margin-bottom: 1rem;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
@@ -14,6 +35,7 @@
     <ul id="messageList"></ul>
   </div>
 
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
@@ -47,12 +69,59 @@
           return;
         }
 
+        let found = false;
+
         snapshot.forEach(child => {
           const msg = child.val();
+          const messageId = child.key;
+
+          // Skip deleted messages
+          if (msg.deleted) return;
+
+          found = true;
+
           const li = document.createElement("li");
-          li.textContent = `${msg.message} 🕓 ${msg.time}`;
+          li.innerHTML = `
+            <div>
+              <p>${msg.message} <br><small>🕓 ${msg.time}</small></p>
+              <button onclick="reportMessage('${key}', '${messageId}', \`${msg.message.replace(/`/g, "\\`")}\`)">🚩 Report</button>
+              <button onclick="deleteMessage('${key}', '${messageId}')">🗑️ Delete</button>
+            </div>
+          `;
           list.appendChild(li);
         });
+
+        if (!found) {
+          list.innerHTML = "<li>No visible messages found in your inbox.</li>";
+        }
+      });
+    }
+
+    function reportMessage(username, messageId, messageText) {
+      const confirmReport = confirm("Are you sure you want to report this message?");
+      if (!confirmReport) return;
+
+      db.ref("reports").push({
+        reportedBy: username,
+        messageId: messageId,
+        message: messageText,
+        time: new Date().toLocaleString()
+      });
+
+      alert("Message reported successfully. Thank you!");
+    }
+
+    function deleteMessage(username, messageId) {
+      const confirmDelete = confirm("Are you sure you want to delete this message?");
+      if (!confirmDelete) return;
+
+      db.ref(`messages/${username}/${messageId}`).update({
+        deleted: true
+      }).then(() => {
+        alert("Message deleted.");
+        loadMessages();
+      }).catch(error => {
+        alert("Error deleting message: " + error.message);
       });
     }
   </script>
